@@ -1,0 +1,383 @@
+-- CREATING TABLES
+
+-- Creating table 1 Client_master
+DROP TABLE Client_master;
+
+CREATE TABLE Client_master (
+client_no varchar2 (6) constraint primary_keyC primary key, constraint checkCNO check (client_no like 'C%'),
+name varchar2 (20) not null,
+address1 varchar2 (30),
+address2 varchar2 (30),
+city varchar2 (15),
+pincode number (6),
+state varchar2 (15),
+bal_due number (10,2)
+);
+
+-- Dropping not used columns
+ALTER TABLE Client_Master
+    DROP(address1, address2);
+
+-- inserting the values of table client_master
+insert into client_master(client_no, name, city, pincode,state,bal_due)
+values('C00001','Ivan Bayross','Bombay',400054,'Maharashtra',15000);
+insert into client_master(client_no, name, city, pincode,state,bal_due)
+values('C00002','Vandana Saitwal','Madras',780001,'Tamil Nadu',0);
+insert into client_master(client_no, name, city, pincode,state,bal_due)
+values('C00003','Pramada Jaguste','Bombay',400057,'Maharashtra',5000);
+insert into client_master(client_no, name, city, pincode,state,bal_due)
+values('C00004','Basu Navindgi','Bombay',400056,'Maharashtra',0);
+insert into client_master(client_no, name, city, pincode,state,bal_due)
+values('C00005','Ravi Sreedharan','Delhi',100001,'Delhi',2000);
+insert into client_master(client_no, name, city, pincode,state,bal_due)
+values('C00006','Rukmini','Bombay',400050,'Maharashtra',0);
+
+SELECT*FROM CLIENT_MASTER;
+
+-- Creating table 2 product_master
+
+DROP TABLE product_master;
+
+CREATE TABLE product_master(
+product_no varchar2 (6) constraint primary_keyP primary key, constraint checkPNO check (product_no like 'P%'),
+description varchar2 (50) not null,
+profit_percent number (3,2) not null,
+unit_measure varchar2 (10) not null,
+qty_on_hand number (8)not null,
+record_lvl number (8) not null,
+sell_price number (8,2) not null constraint checksp check (sell_price>0),
+cost_price number (8,2) not null constraint checkcp check (cost_price>0)
+);
+
+-- inserting data for the table product_master
+insert into product_master values('P00001','1.44 Floppies',5,'Piece',100,20,525,500);
+insert into product_master values('P03453','Monitors',6,'Piece',10,3,12000,11280);
+insert into product_master values('P06734','Mouse',5,'Piece',20,50,1050,1000);
+insert into product_master values('P07865','1.22 Floppies',5,'Piece',100,20,525,500);
+insert into product_master values('P07868','Keyboards',2,'Piece',10,3,3150,3050);
+insert into product_master values('P07885','CD Drive',2.5,'Piece',10,3,5250,5100);
+insert into product_master values('P07965','540 HDD',4,'Piece',10,3,8400,8000);
+insert into product_master values('P07975','1.44 Drive',5,'Piece',10,3,1050,1000);
+insert into product_master values('P08865','1.22 Drive',5,'Piece',2,3,1050,1000);
+
+SELECT*FROM Product_master;
+
+-- Creating table 3 salesman_master
+
+CREATE TABLE salesman_master(
+salesman_no varchar2(6) constraint primary_keyS primary key,constraint checkSNO check (salesman_no like 'S%'),
+salesman_name varchar2(20) not null,
+Address1 varchar2(30) not null,
+Address2 varchar2(30),
+city varchar2(20),
+pincode varchar2(6),
+state varchar2 (20),
+sal_amt number (8,2) not null,
+tgt_to_get number (6,2) not null,
+ytd_sales number (6,2) not null,
+remarks varchar2 (60)
+);
+
+-- Inserting values in table salesman_master
+insert into salesman_master values('S00001','Kiran','A/14','Worli','Bombay',400002,'MAH',3000,100,50,'Good');
+insert into salesman_master values('S00002','Manish','65','Nariman','Bombay',400001,'MAH',3000,200,100,'Good');
+insert into salesman_master values('S00003','Ravi','P-7','Bandra','Bombay',400032,'MAH',3000,200,100,'Good');
+insert into salesman_master values('S00004','Ashish','A/5','Juhu','Bombay',400044,'MAH',3500,200,150,'Good');
+
+SELECT*FROM salesman_master;
+
+-- creating table 4 sales_order
+DROP TABLE sales_order;
+    
+CREATE TABLE sales_order(
+s_order_no varchar2(6) constraint primary_keyO primary key, constraint checkORDERNUMBER check (s_order_no like 'O%'),
+s_order_date date,
+client_no varchar2 (6) constraint foreign_keyC references Client_master(client_no),
+dely_addr varchar2 (25),
+dely_type char (1) default 'F',
+billed_yn char (1) default 'N',
+salesman_no varchar2 (6) constraint foreign_keyS references Salesman_master (salesman_no),
+dely_date date,
+order_status varchar2 (10) constraint checkORDERSTATUS check (order_status in('in process','fullfilled','backOrder','canceled')),
+constraint checkDELYTYPE check (dely_type in('P','F')),
+constraint checkBILLYN check (billed_yn in('Y','N')),
+constraint checkDELYDATE check (dely_date >s_order_date)
+);
+
+-- Dropping not used columns
+ALTER TABLE sales_order
+    DROP(dely_addr);
+
+-- inserting values for table sales_order
+insert into sales_order(s_order_no,s_order_date,client_no,dely_type,billed_Yn,salesman_no,dely_date,order_status)
+values('O19001','12-Jan-1996','C00001','F','N','S00001','20-Jan-1996','in process');
+insert into sales_order(s_order_no,s_order_date,client_no,dely_type,billed_Yn,salesman_no,dely_date,order_status)
+values('O19002','25-Jan-1996','C00002','P','N','S00002','27-Jan-1996','canceled');
+insert into sales_order(s_order_no,s_order_date,client_no,dely_type,billed_Yn,salesman_no,dely_date,order_status)
+values('O46865','18-Feb-1996','C00003','F','Y','S00003','20-Feb-1996','fullfilled');
+insert into sales_order(s_order_no,s_order_date,client_no,dely_type,billed_Yn,salesman_no,dely_date,order_status)
+values('O19003','03-Apr-1996','C00001','F','Y','S00001','07-Apr-1996','fullfilled');
+insert into sales_order(s_order_no,s_order_date,client_no,dely_type,billed_Yn,salesman_no,dely_date,order_status)
+values('O46866','20-May-1996','C00004','P','N','S00002','22-May-1996','canceled');
+insert into sales_order(s_order_no,s_order_date,client_no,dely_type,billed_Yn,salesman_no,dely_date,order_status)
+values('O10008','24-May-1996','C00005','F','N','S00004','26-May-1996','in process');
+
+SELECT*FROM sales_order;
+
+-- Creating table 5 sales_order_details
+DROP TABLE sales_order_details;
+    
+CREATE TABLE sales_order_details(
+s_order_no varchar2(6) constraint foreign_keyS0 references Sales_order(s_order_no),
+product_no varchar2(6) constraint foreign_keyP references product_master(product_no),
+qty_ordered number (8),
+qty_disp  number (8),
+product_rate number (10,2),
+constraint primary_keySP primary key(s_order_no,product_no)
+);
+
+-- inserting values for table sales_order_details
+
+insert into sales_order_details values('O19001','P00001',4,4,525);
+insert into sales_order_details values('O19001','P07965',2,1,8400);
+insert into sales_order_details values('O19001','P07885',2,1,5250);
+insert into sales_order_details values('O19002','P00001',10,0,525);
+insert into sales_order_details values('O46865','P07868',3,3,3150);
+insert into sales_order_details values('O46865','P07885',3,1,5250);
+insert into sales_order_details values('O46865','P00001',10,10,525);
+insert into sales_order_details values('O46865','P03453',4,4,1050);
+insert into sales_order_details values('O19003','P03453',2,2,1050);
+insert into sales_order_details values('O19003','P06734',1,1,12000);
+insert into sales_order_details values('O46866','P07965',1,0,8400);
+insert into sales_order_details values('O46866','P07975',1,0,1050);
+insert into sales_order_details values('O10008','P00001',10,4,525);
+insert into sales_order_details values('O10008','P07975',5,3,1050);
+
+SELECT*FROM sales_order_details;
+
+-- creating table 6 challan_header
+
+CREATE TABLE Challan_Header(
+challan_no varchar2 (6) constraint primary_key primary key,
+s_order_no varchar2 (6) constraint foreign_key references sales_order(s_order_no),
+challan_date date not null,
+billed_yn char (1) default 'N',
+constraint checkchallan_no check (challan_no like 'CH%'),
+constraint checkbilled_yn check (billed_yn in ('Y','N'))
+);
+
+-- inserting the values in table challan_header
+insert into challan_header values('CH9001','O19001','12-Dec-1995','Y');
+insert into challan_header values('CH6865','O46865','12-Nov-1995','Y');
+insert into challan_header values('CH3965','O10008','12-Oct-1995','Y');
+
+SELECT*FROM challan_header;
+
+-- Creating table 7 challan_details
+
+CREATE TABLE challan_details(
+challan_no varchar (6) constraint foreign_keyCN references Challan_header(challan_no),
+product_no varchar (6) constraint foreign_keyPN references product_master(product_no),
+qty_disp number (4,2) not null,
+constraint primary_keyCNPN primary key(challan_no,product_no)
+);
+
+-- Inserting values for challan_details
+insert into challan_details values('CH9001','P00001',4);
+insert into challan_details values('CH9001','P07965',1);
+insert into challan_details values('CH9001','P07885',1);
+insert into challan_details values('CH6865','P07868',3);
+insert into challan_details values('CH6865','P03453',4);
+insert into challan_details values('CH6865','P00001',10);
+insert into challan_details values('CH3965','P00001',5);
+insert into challan_details values('CH3965','P07975',2);
+
+SELECT*FROM challan_details;
+
+-- SHOWING ALL TABLES
+
+SELECT*FROM client_master;
+SELECT*FROM product_master;
+SELECT*FROM salesman_master;
+SELECT*FROM sales_order;
+SELECT*FROM sales_order_details;
+SELECT*FROM challan_header;
+SELECT*FROM challan_details;
+
+-- day 2 assignmnet
+
+--1) Find out the names of all the clients.
+SELECT name FROM Client_master;
+
+--2) Print the entire client_master table.
+SELECT*FROM Client_master;
+
+--3) Retrieve the list of names and the cities of all the clients
+SELECT name, city FROM Client_master;
+
+--4) List the various products available from the product_master table.
+SELECT Description "product name" FROM product_master;
+
+--5) Find the names of all clients having ‘a’ as the second letter in their table.
+SELECT name FROM Client_master WHERE name like '_a%'
+
+--6) Find the names of all clients who stay in a city whose second letter is ‘a’
+SELECT name, city FROM Client_master WHERE city like '_a%'
+
+--7) Find out the clients who stay in a city ‘Bombay’ or city ‘Delhi’ or city ‘Madras’.
+SELECT name,city FROM Client_master WHERE city IN('Bombay', 'Delhi', 'Madras');
+
+--8) List all the clients who are located in Bombay.
+SELECT*FROM Client_master WHERE city ='Bombay';
+
+--9) Print the list of clients whose bal_due are greater than value 10000
+SELECT*FROM Client_master WHERE bal_due>10000;
+
+--10) Print the information from sales_order table of orders placed in the month of January.
+SELECT s_order_no, s_order_date FROM sales_order WHERE to_char(s_order_date,'Mon')='Jan';
+
+--11) Display the order information for client_no ‘C00001’ and ‘C00002’
+SELECT*FROM sales_order WHERE client_no IN('C00001', 'C00002');
+
+--12) Find the products with description as ‘1.44 Drive’ and ‘1.22 Drive’
+SELECT*FROM product_master WHERE description IN('1.44 Drive','1.22 Drive');
+
+--13) Find the products whose selling price is greater than 2000 and less than or equal to 5000
+SELECT*FROM product_master WHERE sell_price >2000 and sell_price <=5000;
+
+--14) Find the products whose selling price is more than 1500 and also find the new selling price as original selling price * 15
+SELECT Description "Product Name", 
+sell_price "Selling Price ", 
+sell_price*.15+sell_price "New Selling Price" 
+FROM product_master WHERE sell_price>1500;
+
+--15) Rename the new column in the above query as new_price
+SELECT Description "Product Name", 
+sell_price "Selling Price ", 
+sell_price*.15+sell_price "new_price" 
+FROM product_master WHERE sell_price>1500;
+
+--16) Find the products whose cost price is less than 1500
+SELECT*FROM product_master WHERE cost_price<1500;
+
+--17) List the products in sorted order of their description.
+SELECT*FROM product_master ORDER BY Description;
+
+--18) Calculate the square root the price of each product.
+SELECT sqrt(sell_price) "Price" FROM product_master;
+
+--19) Divide the cost of product ‘540 HDD’ by difference between its price and 100
+SELECT sell_price ,ROUND( sell_price / (sell_price-100),2) FROM product_master;
+
+--20) List the names, city and state of clients not in the state of Maharashtra
+SELECT name,city,state FROM client_master WHERE NOT state='Maharashtra';
+
+--21) List the product_no, description, sell_price of products whose description begin with letter ‘M’
+SELECT product_no, description, sell_price FROM product_master WHERE description LIKE 'M%';
+
+--22) List all the orders that were canceled in the month of May.
+SELECT * FROM sales_order WHERE order_status = 'canceled' AND TO_CHAR(dely_date,'MM')=05
+
+--23) Count the total number of orders.
+SELECT COUNT(*) FROM sales_order;
+
+--24) Calculate the average price of all the products.
+SELECT AVG(sell_price) FROM product_master;
+SELECT AVG(cost_price) FROM product_master;
+
+--25) Calculate the minimum price of products.
+SELECT MIN(sell_price) FROM product_master;
+
+--26) Determine the maximum and minimum product prices. Rename the title as max_price and min_price respectively.
+SELECT MIN(sell_price) "min_price", MAX(sell_price) "max_price" FROM product_master;
+
+--27) Count the number of products having price greater than or equal to 1500.
+SELECT COUNT(*) FROM product_master WHERE sell_price >= 1500;
+
+--28) Find all the products whose qty_on_hand is less than reorder level.
+SELECT*FROM product_master WHERE qty_on_hand<record_lvl;
+
+--29) Print the information of client_master, product_master, sales_order table in the following formate for all the records {cust_name} has placed order {order_no} on {s_order_date}.
+SELECT name ||' has placed order '||s_order_no||' on '||s_order_date
+FROM client_master, sales_order
+WHERE client_master.client_no = sales_order.client_no;
+
+--30) Print the description and total qty sold for each product.
+SELECT description, sum(qty_disp) "Total Quantity Sold"
+FROM product_master, sales_order_details
+WHERE product_master.product_no = sales_order_details.product_no
+GROUP BY description;
+
+--31) Find the value of each product sold.
+SELECT description, sum(qty_disp * product_rate) "Total Value" FROM product_master, sales_order_details
+WHERE product_master.product_no = sales_order_details.product_no GROUP BY description;
+
+--32) Calculate the average qty sold for each client that has a maximum order value of 15000.00
+SELECT client_master.client_no, AVG(qty_disp), sum(qty_disp*product_rate) FROM client_master, sales_order, sales_order_details
+WHERE client_master.client_no = sales_order.client_no AND sales_order.s_order_no = sales_order_details.s_order_no
+GROUP BY client_master.client_no HAVING sum(qty_disp * product_rate) <= 15000
+
+--33) Find out the total sales amount receivable for the month of jan. it will be the sum total of all the billed orders for the month.
+SELECT s_order_date,sum(qty_disp*product_rate) FROM sales_order, sales_order_details
+WHERE sales_order.s_order_no = sales_order_details.s_order_no AND billed_yn='y' AND to_char(s_order_date, 'MON')='JAN'
+GROUP BY s_order_date;
+
+--34) Print the information of product_master, order_detail table in the following format for all the records {Description} worth Rs. {Total sales for the product} was sold.
+SELECT Description|| ' worth Rs.'||sum(qty_disp*product_rate) || ' was sold'
+FROM client_master, sales_order, sales_order_details, product_master
+WHERE client_master.client_no = sales_order.client_no AND product_master.product_no = sales_order_details.product_no AND
+sales_order.s_order_no = sales_order_details.s_order_no
+GROUP BY description;
+
+--35) Print the information of product_master, order_detail table in the following format for all the records {Description} worth Rs. {Total sales for the product} was produced in the month of {s_order_date} in month formate.
+SELECT Description|| ' worth Rs.'||sum(qty_disp*product_rate) || ' was produced in the month of '|| to_char(s_order_date,'Month')
+FROM client_master, sales_order, sales_order_details, product_master
+WHERE client_master.client_no = sales_order.client_no AND product_master.product_no = sales_order_details.product_no AND
+sales_order.s_order_no = sales_order_details.s_order_no
+GROUP BY description, s_order_date;
+
+--36) Find the product_no and description of non-moving products.
+SELECT product_no , description FROM product_master WHERE product_no IN
+    (SELECT product_no FROM sales_order_details WHERE s_order_no IN
+    (SELECT s_order_no FROM sales_order WHERE order_status='IP') 
+);
+
+--37) Find the customer name, address1, address2, city and pin code for the client who has placed order no ‘O19001’
+SELECT name, city, pincode FROM Client_master WHERE client_no IN(
+SELECT client_no FROM sales_order WHERE s_order_no ='O19001');
+
+--38) Find the client names who have placed orders before the month of May, 1996
+SELECT*FROM client_master WHERE client_no IN(
+SELECT client_no FROM sales_order WHERE to_char(s_order_date,'MM')<05);
+
+--39) Find out if product ‘1.44 Drive’ is ordered by client and print the client_no, name to whom it is was sold.
+SELECT c.client_no , c.name, p.description FROM
+client_master c, product_master p, sales_order s, sales_order_details sod
+WHERE (s.client_no=c.client_no AND sod.product_no=p.product_no AND sod.s_order_no=s.s_order_no) AND p.description != '1.44 Floppies';
+
+--40) Find the names of clients who have placed orders worth Rs. 10000 or more.
+SELECT name FROM client_master WHERE client_no IN(
+	SELECT client_no FROM sales_order WHERE s_order_no IN(
+    SELECT s_order_no FROM sales_order_details WHERE product_rate*qty_ordered>=10000
+	)
+);
+
+--41) Display the order number and day o which clients placed their order.
+SELECT s.s_order_no, to_char(s.s_order_date,'DD')  "Day"
+FROM sales_order s, sales_order_details sod WHERE s.s_order_no=sod.s_order_no;
+
+--42) Display the month (in alphabets) and date when the order must deliver.
+SELECT to_char(dely_date,'month'), to_char(dely_date,'dd')
+FROM sales_order;
+
+43) Display the s_order_date in the format ‘DD-MM-YY’. E.g. 12-February-1996
+
+44) Find the date, 15 days after today’s date.
+
+45) Find the number of days elapsed between today’s date and the delivery date of the orders placed by the clients.
+46) Change the s_order_date of client_no ‘C00001’ to 24/07/96.
+
+47) Change the selling price of ‘1.44 Floppy Drive’ to Rs. 1150.00
+48) Delete the records with order number ‘O19001’ from the order table.
+
+49) Delete all the records having delivery date before 10th July’96
