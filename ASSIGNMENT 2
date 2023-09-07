@@ -370,14 +370,41 @@ FROM sales_order s, sales_order_details sod WHERE s.s_order_no=sod.s_order_no;
 SELECT to_char(dely_date,'month'), to_char(dely_date,'dd')
 FROM sales_order;
 
-43) Display the s_order_date in the format ‘DD-MM-YY’. E.g. 12-February-1996
+--43) Display the s_order_date in the format ‘DD-MM-YY’. E.g. 12-February-1996
+SELECT to_char(s_order_date,'dd-month-yyyy') FROM sales_order;
 
-44) Find the date, 15 days after today’s date.
+--44) Find the date, 15 days after today’s date.
+SELECT sysdate+15 FROM dual;
 
-45) Find the number of days elapsed between today’s date and the delivery date of the orders placed by the clients.
-46) Change the s_order_date of client_no ‘C00001’ to 24/07/96.
+--45) Find the number of days elapsed between today’s date and the delivery date of the orders placed by the clients.
+SELECT dely_date, (sysdate-dely_date) FROM sales_order;
 
-47) Change the selling price of ‘1.44 Floppy Drive’ to Rs. 1150.00
-48) Delete the records with order number ‘O19001’ from the order table.
+--46) Change the s_order_date of client_no ‘C00001’ to 24/07/96.
+ALTER TABLE sales_order DISABLE CONSTRAINT CHECKDELYDATE;
+UPDATE sales_order SET s_order_date='24-jul-1996'
+WHERE client_no='C00001';
 
-49) Delete all the records having delivery date before 10th July’96
+--47) Change the selling price of ‘1.44 Floppy Drive’ to Rs. 1150.00
+UPDATE product_master SET sell_price=1150
+WHERE description='1.44 Floppies';
+
+--48) Delete the records with order number ‘O19001’ from the order table.
+DELETE FROM sales_order WHERE s_order_no ='O19001';
+
+--49) Delete all the records having delivery date before 10th July’96
+DELETE FROM sales_order WHERE dely_date>'10-JUL-1996';
+
+--50) Change the city of client_no ‘C00005’ to ’Bombay’.
+UPDATE client_master SET city='Bombay'WHERE client_no='C00005';
+
+--51) Change the delivery date of order number ‘O10008” to 16/08/96
+UPDATE sales_order SET dely_date='16-aUG-1996'
+WHERE s_order_no='O10008';
+
+--52) Change the bal_due of client_no ‘C00001’ to 1000
+UPDATE client_master SET bal_due=1000
+WHERE client_no='C00001';
+
+--53) Change the cost price of ‘1.22 Floppy Drive’ to Rs. 950.00.
+UPDATE product_master SET cost_price=950.00
+WHERE description='1.44 Floppies';
