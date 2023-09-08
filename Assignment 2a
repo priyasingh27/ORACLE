@@ -1,0 +1,81 @@
+-- ASSIGNMNET
+
+--CREATE TABLES
+-- 1ST APRIL 2023 -31ST MARCH 2024
+    -- YEAR DETAILS
+       --year_id -pk 
+       --start_date 1ST APRIL 2023
+       -- end_date  31ST MARCH 2024
+
+--12 MONTH ENTRIES
+   -- MONTH DETAILS 
+       --month_id -pk
+       --month_start_date   
+       --month_end_date 
+
+-- 12* 30/31/28 
+   --DAY DETAILLS
+       -- day_id -pk
+       --day_date
+
+CREATE TABLE year_details(
+    year_id NUMBER(10), CONSTRAINT year_id_pk PRIMARY KEY(year_id),
+    year_start_date DATE,
+    year_end_date DATE
+);
+
+CREATE TABLE month_details(
+    month_id NUMBER(10), CONSTRAINT month_id_pk PRIMARY KEY(month_id),
+    month_start_date DATE,
+    month_end_date DATE,
+    year_id NUMBER(10),
+    CONSTRAINT year_id_fk FOREIGN KEY(year_id) REFERENCES year_details(year_id)
+);
+
+CREATE TABLE day_details(
+    day_id NUMBER(10), CONSTRAINT day_id_pk PRIMARY KEY(day_id),
+    day_date DATE,
+    month_id NUMBER(10),
+    CONSTRAINT month_id_fk FOREIGN KEY(month_id) REFERENCES month_details(month_id)
+);
+
+SELECT*FROM year_details;
+SELECT*FROM month_details;
+SELECT*FROM day_details;
+
+DROP TABLE year_details;
+DROP TABLE month_details;
+DROP TABLE day_details;
+
+DECLARE
+    year_start_date DATE := TO_DATE('2023-04-01','YYYY-MM-DD');
+	year_end_date DATE := TO_DATE('2024-03-31','YYYY-MM-DD');
+	year_id_counter NUMBER(2) := 1;
+	month_id_counter NUMBER(10) := 1;
+	month_end_date DATE;
+	month_start_date DATE := TO_DATE('2023-04-01','YYYY-MM-DD');
+	day_id_counter NUMBER(10) := 1;
+	day_date DATE;
+BEGIN
+    INSERT INTO year_details VALUES(year_id_counter, year_start_date, year_end_date);
+	<<outer_loop>>
+    LOOP
+        -- insert 12 rows into month_details table
+        month_end_date := LAST_DAY(month_start_date);
+        INSERT INTO month_details VALUES(month_id_counter, month_start_date, month_end_date, year_id_counter);
+		day_date :=  month_start_date;
+
+        <<inner_loop>>
+        LOOP
+        	-- insert 365 rows into days_details table
+            INSERT INTO day_details VALUES(day_id_counter, day_date, month_id_counter);
+			day_id_counter := day_id_counter + 1;
+			EXIT inner_loop WHEN day_date = month_end_date;
+			day_date := day_date + 1;
+        END LOOP inner_loop;
+
+		month_id_counter := month_id_counter + 1;
+		month_start_date := ADD_MONTHS(month_start_date, 1);
+		EXIT outer_loop WHEN month_id_counter > 12;
+	END LOOP outer_loop;
+END;
